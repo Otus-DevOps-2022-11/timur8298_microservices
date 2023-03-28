@@ -1,4 +1,4 @@
-FROM ruby:2.2
+FROM ruby:2.3
 RUN apt-get update -qq \
   && apt-get install --no-install-recommends -y --force-yes build-essential \
   && rm -rf /var/lib/apt/lists/*

@@ -52,3 +52,12 @@ mongo               4.2-rc    3974c5e3b793   6 days ago           388MB
 
 Для работы пришлось использовать образ mongo не latest, а конкретной версии 4.2-rc, иначе новая монга не понимала устаревших инструкций.
 Также не корректно работало приложение post, решилось добавлением зависимости в файл requirements.txt
+
+# HW-16 Сетевое взаимодействие Docker контейнеров. Docker Compose. Тестирование образов
+Пробуем разные сетевые драйвера None, host network driwer, bridge исследование их работы
+Docker-compose, параметризация с помощью файла .env
+Имя проекта в docker-compose можно сменить при запуске, при помощи ключа -p "project_name" либо при помощи переменной COMPOSE_PROJECT_NAME
+(https://docs.docker.com/compose/environment-variables/envvars/#compose_project_name)
+
+Задания со **
+создан файл docker-compose.override.yml который будет переопределять действующие контейнеры
