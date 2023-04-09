@@ -2,32 +2,54 @@ version: '3.3'
 services:
   post_db:
     image: mongo:${MONGO_VER}
+    container_name: post_db
     volumes:
       - post_db:/data/db
     networks:
       - back_net
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
 
   ui:
-#    build: ./ui
     image: ${USERNAME}/ui:${SERVICE_VER}
     ports:
       - ${EXT_PORT}:9292/tcp
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.ui
     networks:
       - front_net
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
 
   post:
-#    build: ./post-py
     image: ${USERNAME}/post:${SERVICE_VER}
+    container_name: post
+    depends_on:
+      - post_db
+    ports:
+      - "5000:5000"
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.post
     networks:
       - front_net
       - back_net
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+
 
   comment:
-#    build: ./comment
     image: ${USERNAME}/comment:${SERVICE_VER}
     networks:
       - back_net
       - front_net
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
 
   prometheus:
     image: ${USERNAME}/prometheus
