@@ -1,0 +1,63 @@
+---
+- name: Install docker
+  hosts: all
+  become: true
+  tasks:
+  - name: Install system packages
+    apt:
+      name: "{{ item }}"
+      state: latest
+      update_cache: yes
+    loop:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo:  deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+
+  - name: Install docker-ce
+    apt:
+      name: "{{ item }}"
+      state: latest
+      update_cache: yes
+    loop:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - jq
+
+  - name: Add user to docker group
+    user:
+      name: "{{ansible_user}}"
+      group: docker
+
+  - name: Disable swap for current session
+    command: swapoff -a
+    become: true
+
+  - name: Disable swap permanently, persist reboots
+    replace:
+      path: /etc/fstab
+      regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+      replace: '#\1\2\3swap\4'
+      backup: yes
+
+  - name: install python dependencies
+    apt:
+      update_cache: yes
+      state: latest
+      name: python3-pip
+
+  - name: install 'Docker SDK for Python'
+    pip:
+      name: docker
