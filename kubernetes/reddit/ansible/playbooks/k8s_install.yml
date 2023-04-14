@@ -1,0 +1,87 @@
+---
+- name: Installing Kubernetes
+  hosts: k8s
+  vars:
+    k8s_version: 1.19.16-00
+  become: yes
+  tasks:
+    - name: Add an apt signing key for k8s
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add apt repository for stable version
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+
+    - name: Install k8s
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - kubeadm={{k8s_version}}
+          - kubelet={{k8s_version}}
+          - kubectl={{k8s_version}}
+
+    - name: Hold k8s version
+      dpkg_selections:
+        name: "{{item}}"
+        selection: hold
+      with_items:
+        - kubeadm
+        - kubelet
+        - kubectl
+
+- name: Configure k8s cluster
+  hosts: master
+  tasks:
+    - name: Make master node
+      command: kubeadm init --node-name k8s-master --pod-network-cidr={{subnet_cidr}}
+      become: yes
+
+    - name: Create config dir
+      file:
+        path: /home/{{ansible_user}}/.kube
+        state: directory
+
+    - name: Copy config file
+      become: yes
+      copy:
+        remote_src: yes
+        src: /etc/kubernetes/admin.conf
+        dest: /home/{{ansible_user}}/.kube/config
+
+    - name: Change config owner
+      become: yes
+      file:
+        path: /home/{{ansible_user}}/.kube/config
+        owner: "{{ansible_user}}"
+        group: "{{ansible_user}}"
+
+    - name: Install flannel network
+      command: kubectl apply -f https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml?raw=true
+
+    - name: Generate join command
+      command: kubeadm token create --print-join-command
+      register: join_command
+
+    - name: Copy join command to local file
+      local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
+
+    - name: Debug
+      debug: var=join_command
+
+- name: Join slaves to cluster
+  hosts: worker
+  tags:
+    - continue
+  tasks:
+    - name: Copy the join command to server location
+      copy: src=join-command dest=/tmp/join-command.sh mode=0777
+
+    - name: Join the node to cluster
+      become: yes
+      command: sh /tmp/join-command.sh

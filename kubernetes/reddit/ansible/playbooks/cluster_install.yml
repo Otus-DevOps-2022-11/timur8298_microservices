@@ -1,0 +1,5 @@
+---
+- name: Install docker
+  import_playbook: docker_install.yml
+- name: Install k8s
+  import_playbook: k8s_install.yml
