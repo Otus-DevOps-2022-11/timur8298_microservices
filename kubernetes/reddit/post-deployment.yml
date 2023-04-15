@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,7 +7,7 @@ metadata:
     app: reddit
     component: post
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: reddit
@@ -23,4 +24,4 @@ spec:
         name: post
         env:
         - name: POST_DATABASE_HOST
-          value: post-db
+          value: comment-db

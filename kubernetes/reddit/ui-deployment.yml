@@ -1,18 +1,18 @@
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: # Блок метаданных деплоя
+metadata:
   name: ui
   labels:
     app: reddit
     component: ui
-spec: # Блок спецификации деплоя
-  replicas: 1
+spec:
+  replicas: 3
   selector:
     matchLabels:
       app: reddit
       component: ui
-  template: # Блок описания POD-ов
+  template:
     metadata:
       name: ui-pod
       labels:
@@ -20,7 +20,7 @@ spec: # Блок спецификации деплоя
         component: ui
     spec:
       containers:
-      - image: timur8298/ui # Не забудьте подставить свой образ
+      - image: timur8298/ui
         name: ui
         env:
         - name: ENV
