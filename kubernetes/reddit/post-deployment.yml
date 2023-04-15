@@ -13,7 +13,7 @@ spec:
       component: post
   template:
     metadata:
-      name: post-pod
+      name: post
       labels:
         app: reddit
         component: post
@@ -22,5 +22,5 @@ spec:
       - image: timur8298/post
         name: post
         env:
-        - name: COMMENT_DATABASE_HOST
+        - name: POST_DATABASE_HOST
           value: post-db
