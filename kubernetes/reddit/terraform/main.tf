@@ -12,51 +12,64 @@ provider "yandex" {
   folder_id                = var.folder_id
   zone                     = var.zone
 }
-resource "yandex_compute_instance" "k8s" {
-  count = var.instances
-  name  = "k8s-node-${count.index}"
 
-  resources {
-    cores  = 4
-    memory = 4
+resource "yandex_kubernetes_cluster" "testkube" {
+  network_id = var.network_id
+  master {
+    version = "1.23"
+    zonal {
+      zone      = var.zone
+      subnet_id = var.subnet_id
+    }
+    public_ip = true
   }
+  name = "testkube"
+  service_account_id      = var.k8s_account_id
+  node_service_account_id = var.k8s_account_id
 
-  boot_disk {
-    initialize_params {
-      image_id = var.image_id
-      size     = 40
-      type     = "network-ssd"
+  release_channel = "RAPID"
+  network_policy_provider = "CALICO"
+}
+
+resource "yandex_kubernetes_node_group" "test-group" {
+  cluster_id = yandex_kubernetes_cluster.testkube.id
+  name       = "test-group"
+  version    = "1.23"
+
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat        = true
+      subnet_ids = [var.subnet_id]
+    }
+
+    resources {
+      cores         = 4
+      memory        = 8
+      core_fraction = 50
+    }
+
+    scheduling_policy {
+      preemptible = true
+    }
+
+    boot_disk {
+      type = "network-ssd-nonreplicated"
+      size = 93
+    }
+
+    container_runtime {
+      type = "containerd"
+    }
+
+    metadata = {
+      ssh-keys = "ubuntu:${file(var.public_key_path)}"
     }
   }
-
-
-  network_interface {
-    subnet_id = yandex_vpc_subnet.kube-subnet.id
-    nat       = true
-  }
-  metadata = {
-    ssh-keys = "ubuntu:${file(var.public_key_path)}"
-  }
-}
-resource "yandex_vpc_network" "kube-network" {
-  name = "kube-network"
-}
-
-resource "yandex_vpc_subnet" "kube-subnet" {
-  name           = "kube-subnet"
-  zone           = "ru-central1-a"
-  network_id     = yandex_vpc_network.kube-network.id
-  v4_cidr_blocks = [var.cidr]
-}
-
-resource "local_file" "inventory_tmpl" {
-  content = templatefile("../ansible/inventory.tmpl",
-    {
-      k8s_ex_ip = yandex_compute_instance.k8s[*].network_interface.0.nat_ip_address
-      k8s_ip    = yandex_compute_instance.k8s[*].network_interface.0.ip_address
-      cidr      = var.cidr
+  scale_policy {
+    fixed_scale {
+      size = 2
     }
-  )
-  file_permission = "0644"
-  filename        = "../ansible/inventory"
+  }
 }
