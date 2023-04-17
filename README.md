@@ -98,3 +98,21 @@ Docker-compose, параметризация с помощью файла .env
 
 Задание со **
 Описал установку кластера k8s с помощью terraform и ansible
+
+# HW-20 Kubernetes. Запуск кластера и приложения. Модель безопасности
+Развернул minikube для разворачивания локальной инсталяции Kubernetes с помощью драйвера docker, настроил kubectl для работы с ним
+Развернул компоненты нашего приложения, проверил его работу
+Добавил базу данных mongodb, настроил ее доступность для сервисов
+Запустил Dashboard, посмотрел его функционал
+Запустил окружение dev и запустил приложение в пространстве имен dev
+Создал кластер в облаке Yandex cloud, развернул приложение в нем, в пространстве имен dev, проверил работоспособность, опубликовал пост
+
+Задание со **
+Описал установку кластера Kubernetes-кластер в Yandex cloud с помощью Terraform
+для справки: https://registry.tfpla.net/providers/yandex-cloud/yandex/latest/docs/resources/kubernetes_cluster
+
+Запустил dashboard kubectl apply -f ./kubernetes/dashboard
+Для установки:
+kubectl -n kubernetes-dashboard create token admin-user получаем токен доступа
+kubectl proxy -n kubernetes-dashboard 
+Перейти http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/ и ввести токен доступа.

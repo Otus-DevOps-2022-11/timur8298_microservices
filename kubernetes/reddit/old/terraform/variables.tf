@@ -27,9 +27,11 @@ variable "service_account_key_file" {
 variable "private_key_path" {
   description = "path to private key"
 }
-variable "k8s_account_id" {
-  description = "k8s_account_id"
+variable "instances" {
+  description = "count instances"
+  default     = 1
 }
-variable "network_id" {
-  description = "network id"
+variable "cidr" {
+  description = "Subnet"
+  default     = "192.168.10.0/24"
 }
