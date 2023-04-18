@@ -31,5 +31,4 @@ spec:
           mountPath: /data/db
       volumes:
       - name: mongo-persistent-storage
-        persistentVolumeClaim:
-          claimName:  mongo-pvc-dynamic
+        emptyDir: {}
