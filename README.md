@@ -116,3 +116,13 @@ Docker-compose, параметризация с помощью файла .env
 kubectl -n kubernetes-dashboard create token admin-user получаем токен доступа
 kubectl proxy -n kubernetes-dashboard 
 Перейти http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/ и ввести токен доступа.
+
+# HW-21 Kubernetes. Networks, Storages.
+Запустил кластер kubernetes через терраформ в yandex cloud и развернул reddit приложение
+Настроил LoadBalancer по инструкции
+Настроил Ingress c https
+Задание со **
+Описал создаваемый объект Secret в виде Kubernetes-манифеста kubernetes/reddit/ui-ingress-tls.yml
+Настроил NetworkPolicy
+Настроил PersistentVolume, PersistentVolumeClaim, прикрепил к деплою mongo, 
+проверил доступность после удаления и пересоздания деплоймента монги
