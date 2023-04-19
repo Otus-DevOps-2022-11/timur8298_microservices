@@ -16,7 +16,7 @@ provider "yandex" {
 resource "yandex_kubernetes_cluster" "testkube" {
   network_id = var.network_id
   master {
-    version = "1.23"
+    version = "1.21"
     zonal {
       zone      = var.zone
       subnet_id = var.subnet_id
@@ -27,14 +27,14 @@ resource "yandex_kubernetes_cluster" "testkube" {
   service_account_id      = var.k8s_account_id
   node_service_account_id = var.k8s_account_id
 
-  release_channel = "RAPID"
   network_policy_provider = "CALICO"
+  release_channel = "RAPID"
 }
 
 resource "yandex_kubernetes_node_group" "test-group" {
   cluster_id = yandex_kubernetes_cluster.testkube.id
   name       = "test-group"
-  version    = "1.23"
+  version    = "1.21"
 
   instance_template {
     platform_id = "standard-v2"
@@ -45,8 +45,8 @@ resource "yandex_kubernetes_node_group" "test-group" {
     }
 
     resources {
-      cores         = 4
-      memory        = 8
+      cores         = 2
+      memory        = 4
       core_fraction = 50
     }
 
@@ -69,7 +69,7 @@ resource "yandex_kubernetes_node_group" "test-group" {
   }
   scale_policy {
     fixed_scale {
-      size = 2
+      size = 1
     }
   }
 }
