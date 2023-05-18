@@ -126,3 +126,14 @@ kubectl proxy -n kubernetes-dashboard
 Настроил NetworkPolicy
 Настроил PersistentVolume, PersistentVolumeClaim, прикрепил к деплою mongo, 
 проверил доступность после удаления и пересоздания деплоймента монги
+
+# HW-22 Интеграция Kubernetes в GitlabCI
+Установил helm v2, и tiller в кластер kubernetes в YC
+Создал чарты для компонентов приложения
+Создал в каждом из каталогов templates по файлу _helpers.tpl, в котором создал функции post.fullname, ui.fullname
+Собрал все чарты под одним чартом reddit, добавил рабочий mongodb
+Добавил переменные окружения для связи компонентов друг с другом и отключил авторизацию у mongodb, из-за чего не стартовал post.
+Gitlab завести по методичке не получилось, запустил через helm чарт
+Создал репозитории comment, post, ui, reddit-deploy
+Выполнил остальные задания по методичке.
+Задания со ** не выполнялись
