@@ -27,7 +27,7 @@ resource "yandex_kubernetes_cluster" "testkube" {
   service_account_id      = var.k8s_account_id
   node_service_account_id = var.k8s_account_id
 
-  network_policy_provider = "CALICO"
+#  network_policy_provider = "CALICO"
   release_channel = "RAPID"
 }
 
@@ -45,9 +45,9 @@ resource "yandex_kubernetes_node_group" "test-group" {
     }
 
     resources {
-      cores         = 2
-      memory        = 4
-      core_fraction = 50
+      cores         = 4
+      memory        = 16
+      core_fraction = 100
     }
 
     scheduling_policy {
